@@ -153,18 +153,30 @@ app.post('/api/protected/posts', async (c) => {
 });
 
 // 添加评论
-app.post('/api/protected/posts/:id/comments', async (c: any) => {
-  const postId = Number(c.req.param('id'));
-  const payload = c.get('jwtPayload') as JWTPayload;
-  const { content } = await c.req.json();
-  const db = drizzle(c.env.DB);
+app.post('/api/protected/posts/:id/comments', async (c) => {
+  try {
+    const postId = Number(c.req.param('id'));
+    const payload = c.get('jwtPayload') as any;
+    const { content } = await c.req.json();
+    const db = drizzle(c.env.DB);
 
-  await db.insert(comments).values({
-    postId,
-    content,
-    authorId: payload.sub,
-  });
-  return c.json({ success: true }, 201);
+    // 增加一步检查，防止写入空数据
+    if (!content) return c.json({ error: "内容不能为空" }, 400);
+
+    await db.insert(comments).values({
+      postId,
+      content,
+      // 这里的 key 必须和 schema.ts 里的变量名一致
+      // 值必须和登录 sign 时存入的 key 一致
+      authorId: payload.username || payload.sub,
+    });
+
+    return c.json({ success: true }, 201);
+  } catch (err: any) {
+    // 将具体错误打印出来，这样即使没开 wrangler tail，也能在 network 看到一点线索
+    console.error("Comment Error:", err.message);
+    return c.json({ error: err.message }, 500);
+  }
 });
 
 export default app;
