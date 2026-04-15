@@ -1,32 +1,18 @@
-```txt
-npm install
-npm run dev
-```
+# 文档说明
 
-```txt
-npm run deploy
-```
+## 功能指令
 
-[For generating/synchronizing types based on your Worker configuration run](https://developers.cloudflare.com/workers/wrangler/commands/#types):
-
-```txt
-npm run cf-typegen
-```
-
-Pass the `CloudflareBindings` as generics when instantiation `Hono`:
-
-```ts
-// src/index.ts
-const app = new Hono<{ Bindings: CloudflareBindings }>()
-```
-
-## 功能代码
-
-## 指令
-
-- 本地连接线上数据库
+本地连接线上数据库
 - npx wrangler dev --remote
-- 发版
+连接本地数据库
+- npx wrangler dev --local
+
+发版
 - npx wrangler deploy
-- 启动
+启动
 - npm run dev
+
+将线上数据导出为 SQL 文件
+- npx wrangler d1 export forum-db --remote --output=dump.sql
+将数据导入到本地库
+- npx wrangler d1 execute forum-db --local --file=dump.sql
