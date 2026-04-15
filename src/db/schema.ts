@@ -6,7 +6,7 @@ export const posts = sqliteTable('posts', {
   title: text('title').notNull(),
   content: text('content').notNull(),
   authorId: text('author_id').notNull(), // 对应登录用户的 ID
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(new Date()),
+  createdAt: text('created_at',),
 });
 
 // 评论表
@@ -15,5 +15,5 @@ export const comments = sqliteTable('comments', {
   postId: integer('post_id').references(() => posts.id),
   content: text('content').notNull(),
   authorId: text('author_id').notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(new Date()),
+  createdAt: text('created_at',),
 });

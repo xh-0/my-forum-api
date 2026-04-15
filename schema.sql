@@ -16,3 +16,11 @@ CREATE TABLE IF NOT EXISTS comments (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES posts(id)
 );
+
+-- 用户表
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT, -- 实际开发建议存储加密后的 Hash
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
