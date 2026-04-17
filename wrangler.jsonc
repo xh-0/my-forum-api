@@ -23,7 +23,8 @@
 			// "binding": "forum_db",
 			"binding": "DB",
 			"database_name": "forum-db",
-			"database_id": "aed3d1c9-96c1-4ef4-b64a-724338e04582"
+			"database_id": "aed3d1c9-96c1-4ef4-b64a-724338e04582",
+			"migrations_dir": "./drizzle"
 		}
 	]
 	/**

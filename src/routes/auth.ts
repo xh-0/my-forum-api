@@ -5,18 +5,28 @@ import { Bindings } from '../types';
 const auth = new Hono<{ Bindings: Bindings }>();
 
 // 注册
+// src/routes/auth.ts
+import { drizzle } from 'drizzle-orm/d1';
+import { users } from '../db/schema';
+import { eq } from 'drizzle-orm';
+
 auth.post('/register', async (c) => {
-  const { username, password } = await c.req.json();
-  if (!username || username.length < 2) return c.json({ error: '用户名长度至少为 2 位' }, 400);
-
+  const db = drizzle(c.env.DB);
   try {
-    const existingUser = await c.env.DB.prepare('SELECT id FROM users WHERE username = ?').bind(username).first();
-    if (existingUser) return c.json({ error: '用户名已存在' }, 400);
+    const { username, password } = await c.req.json();
 
-    await c.env.DB.prepare('INSERT INTO users (username, password) VALUES (?, ?)').bind(username, password).run();
-    return c.json({ message: '注册成功', username });
+    // 插入数据
+    // 注意：即使数据库是 user_id，这里也写变量名 username/password
+    await db.insert(users).values({
+      username,
+      password,
+    }).run();
+
+    return c.json({ success: true, message: '注册成功' });
   } catch (err: any) {
-    return c.json({ error: '服务器内部错误' }, 500);
+    // 如果报错，这里会打印出具体的 SQL 错误，比如 "no such table: users"
+    console.error("DEBUG:", err.message);
+    return c.json({ error: '注册失败', details: err.message }, 500);
   }
 });
 
