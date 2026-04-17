@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS posts (
     author_id TEXT NOT NULL,
     tag TEXT DEFAULT 'all',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 评论表
@@ -15,6 +16,7 @@ CREATE TABLE IF NOT EXISTS comments (
     content TEXT NOT NULL,
     author_id TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES posts(id)
 );
 
@@ -24,4 +26,5 @@ CREATE TABLE IF NOT EXISTS users (
     username TEXT NOT NULL UNIQUE,
     password TEXT, -- 实际开发建议存储加密后的 Hash
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

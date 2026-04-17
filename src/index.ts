@@ -2,8 +2,8 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { jwt } from 'hono/jwt'; // 假设你使用 JWT 校验
 import { drizzle } from 'drizzle-orm/d1';
-import { posts, comments } from './db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { posts, comments, categories } from './db/schema';
+import { eq, desc, asc } from 'drizzle-orm';
 import { sign } from 'hono/jwt';
 
 //  定义 Bindings 类型，确保 c.env.DB 有智能提示
@@ -190,6 +190,68 @@ app.post('/api/protected/posts/:id/comments', async (c) => {
     console.error("Comment Error:", err.message);
     return c.json({ error: err.message }, 500);
   }
+});
+
+// --- 用户侧接口 ---
+
+// 获取所有激活的标签（用于导航栏和下拉框）
+app.get('/api/categories', async (c) => {
+  const db = drizzle(c.env.DB);
+  const result = await db.select().from(categories).orderBy(asc(categories.order)).all();
+  return c.json(result);
+});
+
+// --- 管理侧接口 (建议后续加上权限校验) ---
+
+// 新增或修改标签
+app.post('/api/admin/categories', async (c) => {
+  const db = drizzle(c.env.DB);
+  const body = await c.req.json();
+  const { id, key, value, order } = body;
+  const now = new Date().toISOString();
+
+  try {
+    if (id) {
+      // --- 1. 编辑逻辑 ---
+      await db
+        .update(categories)
+        .set({
+          key,
+          value,
+          order: Number(order),
+          updatedAt: now
+        })
+        .where(eq(categories.id, id))
+        .run();
+
+      return c.json({ success: true, message: "更新成功" });
+    } else {
+      // --- 2. 新增逻辑 ---
+      await db
+        .insert(categories)
+        .values({
+          key,
+          value,
+          order: Number(order),
+          createdAt: now,
+          updatedAt: now
+        })
+        .run();
+
+      return c.json({ success: true, message: "创建成功" });
+    }
+  } catch (err: any) {
+    // 处理 Key 唯一约束冲突等错误
+    return c.json({ success: false, error: err.message }, 400);
+  }
+});
+
+// 删除标签
+app.delete('/api/admin/categories/:id', async (c) => {
+  const db = drizzle(c.env.DB);
+  const id = c.req.param('id');
+  await db.delete(categories).where(eq(categories.id, Number(id))).run();
+  return c.json({ success: true });
 });
 
 export default app;
