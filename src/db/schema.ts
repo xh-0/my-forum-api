@@ -6,6 +6,7 @@ export const posts = sqliteTable('posts', {
   title: text('title').notNull(),
   content: text('content').notNull(),
   authorId: text('author_id').notNull(), // 对应登录用户的 ID
+  tag: text('tag').notNull(),
   createdAt: text('created_at',),
 });
 

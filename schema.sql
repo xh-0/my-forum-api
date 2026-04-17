@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS posts (
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     author_id TEXT NOT NULL,
+    tag TEXT DEFAULT 'all',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

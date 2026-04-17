@@ -3,7 +3,7 @@ import { cors } from 'hono/cors';
 import { jwt } from 'hono/jwt'; // 假设你使用 JWT 校验
 import { drizzle } from 'drizzle-orm/d1';
 import { posts, comments } from './db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { sign } from 'hono/jwt';
 
 //  定义 Bindings 类型，确保 c.env.DB 有智能提示
@@ -46,8 +46,21 @@ app.get('/', (c) => c.text('Forum API is running!')); // 首页
 
 // 获取帖子列表
 app.get('/api/posts', async (c) => {
+  //   const db = drizzle(c.env.DB);
+  //   const result = await db.select().from(posts).all();
+  //   return c.json(result);
+
   const db = drizzle(c.env.DB);
-  const result = await db.select().from(posts).all();
+  const tag = c.req.query('tag'); // 获取 URL 参数中的 tag
+  // 1. 开始基础查询
+  let query = db.select().from(posts);
+  // 2. 如果传了 tag 且不为 'all'，则添加过滤条件
+  if (tag && tag !== 'all') {
+    // 假设你的 schema 中字段名是 tag
+    query = query.where(eq(posts.tag, tag)) as any;
+  }
+  // 3. 添加排序（通常 V2EX 是按最新发布排序）
+  const result = await query.orderBy(desc(posts.createdAt)).all();
   return c.json(result);
 });
 
