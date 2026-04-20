@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { sign } from 'hono/jwt';
 import { Bindings } from '../types';
+import { jwt } from 'hono/jwt';
 
 const auth = new Hono<{ Bindings: Bindings }>();
 
@@ -9,6 +10,40 @@ const auth = new Hono<{ Bindings: Bindings }>();
 import { drizzle } from 'drizzle-orm/d1';
 import { users } from '../db/schema';
 import { eq } from 'drizzle-orm';
+
+const authMiddleware = (c: any, next: any) => {
+  return jwt({ secret: c.env.JWT_SECRET, alg: 'HS256' })(c, next);
+};
+
+// /api/me
+auth.get('/me', authMiddleware, async (c) => {
+  const db = drizzle(c.env.DB);
+  // 获取中间件解析出来的用户信息
+  const payload = c.get('jwtPayload') as any;
+  console.log("JWT Payload:", payload); // 关键调试点
+
+  try {
+    // 根据解析出来的 username 查询数据库
+    const user = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        // 注意：千万不要返回 password 字段！
+      })
+      .from(users)
+      .where(eq(users.username, payload.username))
+      .get();
+
+    if (!user) {
+      return c.json({ error: '用户不存在' }, 404);
+    }
+
+    return c.json({ user });
+  } catch (err: any) {
+    console.error("Fetch User Error:", err.message);
+    return c.json({ error: '获取用户信息失败' }, 500);
+  }
+});
 
 auth.post('/register', async (c) => {
   const db = drizzle(c.env.DB);
