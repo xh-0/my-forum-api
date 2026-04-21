@@ -74,6 +74,7 @@ auth.post('/login', async (c) => {
       exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
     };
     const token = await sign(payload, c.env.JWT_SECRET);
+    // 返回用户的所有信息
     return c.json({ token, user: { username } });
   } catch (err) {
     return c.json({ error: '登录失败' }, 400);

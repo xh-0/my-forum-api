@@ -4,6 +4,7 @@ import { Bindings } from './types';
 import auth from './routes/auth';
 import postApp from './routes/posts';
 import admin from './routes/admin';
+import user from './routes/user';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -27,6 +28,8 @@ app.route('/api/posts', postApp);
 
 // 管理地址就是 /api/admin/categories
 app.route('/api/admin', admin);
+// 用户地址就是 /api/user/posts
+app.route('/api/user', user);
 
 // 首页
 app.get('/', (c) => c.text('DUSK2 Forum API V1'));
