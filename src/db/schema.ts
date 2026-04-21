@@ -7,7 +7,6 @@ export const users = sqliteTable('users', {
   username: text('username').notNull().unique(),
   password: text('password').notNull(),
 
-  // --- 新增字段 ---
   nickname: text('nickname'), // 昵称
   avatarUrl: text('avatar_url'), // 头像地址
   bio: text('bio'), // 个人简介
