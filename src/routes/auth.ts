@@ -81,4 +81,9 @@ auth.post('/login', async (c) => {
   }
 });
 
+// 管理员权限 示例
+// auth.get('/tags/manage', authMiddleware, adminOnly, async (c) => {
+//   // 只有管理员能执行此处的代码
+// });
+
 export default auth;
