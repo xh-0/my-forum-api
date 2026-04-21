@@ -1,4 +1,5 @@
 import { defineConfig } from 'drizzle-kit';
+import 'dotenv/config'
 
 function requiredEnv(name: string): string {
   const value = process.env[name];
@@ -6,8 +7,8 @@ function requiredEnv(name: string): string {
   return value;
 }
 
-// Matches `d1_databases[].database_id` in `wrangler.jsonc`
-const d1DatabaseId = process.env.D1_DATABASE_ID ?? 'aed3d1c9-96c1-4ef4-b64a-724338e04582';
+// const d1DatabaseId = process.env.D1_DATABASE_ID ?? 'aed3d1c9-96c1-4ef4-b64a-724338e04582';
+const d1DatabaseId = requiredEnv('D1_DATABASE_ID'); // Matches `d1_databases[].database_id` in `wrangler.jsonc`
 
 export default defineConfig({
   dialect: 'sqlite',
