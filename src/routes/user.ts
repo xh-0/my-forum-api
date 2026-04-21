@@ -60,7 +60,7 @@ user.patch('/profile', authMiddleware, async (c) => {
   const body = await c.req.json();
 
   // 1. 定义允许修改的字段白名单，防止用户通过前端注入恶意修改权限
-  const { nickname, bio } = body;
+  const { nickname, bio, email } = body;
 
   // 2. 构建更新对象（只包含有值的字段）
   const updateData: any = {
@@ -68,6 +68,7 @@ user.patch('/profile', authMiddleware, async (c) => {
   };
   if (nickname !== undefined) updateData.nickname = nickname;
   if (bio !== undefined) updateData.bio = bio;
+  if (email !== undefined) updateData.email = email;
 
   try {
     // 3. 执行更新
